@@ -1,0 +1,179 @@
+clear all
+A=uint8(abs(load('../../../mod/Lena.fsmod')));
+l=length(A);
+nm=14;
+nl=18;
+nlegen=14;
+
+for i=1:l 
+    if isnan(A(i,1))==true        
+      A(i,1)=1;     
+    end
+end 
+a=imread('../../../imagens/Lena.tiff'); 
+
+
+fin=0;
+j=0;
+while(fin==0)
+
+f=A(1+j: j+256*256);          
+%f=e(aux1: aux1+262143);        % Para as imagens Branca e Preta
+g=f';
+h=vec2mat(g,256);
+
+cryptImage=bitxor(a,h,'uint8');
+
+entropia=entropy(cryptImage);
+
+%imshow(cryptImage);
+j=j+1;
+if (j+256*256==90000)
+    fin=1;
+end
+entrop32(j)=entropia;
+
+I = im2double(cryptImage);
+c_diag = corrcoef(I(1:end-1, 1:end-1), I(2:end, 2:end));
+c_vert = corrcoef(I(1:end-1, :), I(2:end, :));
+c_horz = corrcoef(I(:, 1:end-1), I(:, 2:end));
+
+vert32(j)=c_vert(1,2);
+horz32(j)=c_horz(1,2);
+diag32(j)=c_diag(1,2);
+
+j
+end
+
+H_32=entrop32;
+
+Mentrop132 = movmean(entrop32,1000);
+
+Mvert132 = movmean(vert32,1000);
+Mhorz132 = movmean(horz32,1000);
+Mdiag132 = movmean(diag32,1000);
+
+
+
+
+
+
+f1=figure(1)
+pos=f1.Position;
+pos(3)=pos(3)*1.4;
+pos(4)=pos(4)*0.75;
+set(gcf,'Position',pos)
+plot(Mvert132);
+hold on;
+plot(Mhorz132);
+hold on 
+plot(Mdiag132);
+hold on
+axis([0 24000 -0.005 0.015])
+grid on
+legend('Vertical','Horizontal','Diagonal','Location','NorthEast','FontSize', nlegen);
+set(gca, 'FontName', 'Times New Roman','Fontsize',nm)
+xlabel('$tr$','Interpreter','latex','FontSize', nl)
+ylabel('Corr. coefficients','Interpreter','latex','FontSize',nl)
+print('../../../../TCASI2021_ImageChaoticCrypthosystem/V_Journal/figs/resultados/Correlacao/correlation_32','-depsc')
+print('../../../../TCASI2021_ImageChaoticCrypthosystem/V_Conf/figs/resultados/Correlacao/correlation_32','-depsc')
+drawnow;
+
+
+
+
+A=uint8(abs(load('../../../mod/Lena.fdmod')));
+l=length(A);
+
+for i=1:l 
+    if isnan(A(i,1))==true
+        
+      A(i,1)=1;     
+     
+    end
+end 
+
+fin=0;
+j=0;
+while(fin==0)
+
+f=A(1+j: j+256*256);          
+%f=e(aux1: aux1+262143);        % Para as imagens Branca e Preta
+g=f';
+h=vec2mat(g,256);
+
+cryptImage=bitxor(a,h,'uint8');
+
+entropia=entropy(cryptImage);
+
+%imshow(cryptImage);
+j=j+1;
+if (j+256*256==90000)
+    fin=1;
+end
+entrop64(j)=entropia;
+
+I = im2double(cryptImage);
+c_diag = corrcoef(I(1:end-1, 1:end-1), I(2:end, 2:end));
+c_vert = corrcoef(I(1:end-1, :), I(2:end, :));
+c_horz = corrcoef(I(:, 1:end-1), I(:, 2:end));
+
+vert64(j)=c_vert(1,2);
+horz64(j)=c_horz(1,2);
+diag64(j)=c_diag(1,2);
+
+j
+end
+
+J=zeros(23000,1);
+
+H_32=entrop32;
+
+
+Mentrop2 = movmean(entrop64,1000);
+
+Mvert2 = movmean(vert64,1000);
+Mhorz2 = movmean(horz64,1000);
+Mdiag2 = movmean(diag64,1000);
+
+
+f1=figure(2);
+pos=f1.Position;
+pos(3)=pos(3)*1.4;
+pos(4)=pos(4)*0.75;
+set(gcf,'Position',pos)
+plot(Mentrop132(1:24000));
+hold on ;
+plot(Mentrop2(1:24000));
+grid on
+legend('32 bits','64 bits','Location','SouthEast','FontSize', nlegen);
+axis([0 12000 7.99713 7.99722])
+set(gca, 'FontName', 'Times New Roman','Fontsize',nm)
+xlabel('$tr$','Interpreter','latex','FontSize', nl)
+ylabel('Entropy','Interpreter','latex','FontSize', nl)
+print('../../../../TCASI2021_ImageChaoticCrypthosystem/V_Journal/figs/resultados/Entropia/entropy','-depsc')
+print('../../../../TCASI2021_ImageChaoticCrypthosystem/V_Conf/figs/resultados/Entropia/entropy','-depsc')
+drawnow;
+
+
+f1=figure(3);
+pos=f1.Position;
+pos(3)=pos(3)*1.4;
+pos(4)=pos(4)*0.75;
+set(gcf,'Position',pos)
+
+plot(Mvert2);
+hold on;
+plot(Mhorz2);
+hold on 
+plot(Mdiag2);
+hold on
+legend('Vertical','Horizontal','Diagonal','Location','NorthEast','FontSize', nlegen);
+axis([0 24000 -0.006 0.015])
+grid on
+set(gca, 'FontName', 'Times New Roman','Fontsize',nm)
+xlabel('$tr$','Interpreter','latex','FontSize', nl)
+ylabel('Corr. coefficients','Interpreter','latex','FontSize', nl)
+print('../../../../TCASI2021_ImageChaoticCrypthosystem/V_Journal/figs/resultados/Correlacao/correlation_64','-depsc')
+print('../../../../TCASI2021_ImageChaoticCrypthosystem/V_Conf/figs/resultados/Correlacao/correlation_64','-depsc')
+drawnow;
